@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+const BACKEND_URL = 'https://rural-sports-portal.onrender.com';
+
 export default function App() {
   const [talents, setTalents] = useState([]);
   const [filterSport, setFilterSport] = useState('All');
@@ -13,14 +15,13 @@ export default function App() {
     media: null
   });
 
-  // Fetch compiled data from backend API
   const fetchTalents = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/talents');
+      const res = await fetch(`${BACKEND_URL}/api/talents`);
       const data = await res.json();
       setTalents(data);
     } catch (err) {
-      console.error("Backend offline ya error:", err);
+      console.error("Error fetching data:", err);
     }
   };
 
@@ -45,7 +46,7 @@ export default function App() {
     });
 
     try {
-      const res = await fetch('http://localhost:5000/api/talents', {
+      const res = await fetch(`${BACKEND_URL}/api/talents`, {
         method: 'POST',
         body: data
       });
@@ -79,7 +80,6 @@ export default function App() {
       </header>
 
       <div className="grid-layout">
-        {/* Left Side: Talent Submission Form */}
         <div>
           <div className="card">
             <h2>Post Talent Details</h2>
@@ -126,7 +126,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* Right Side: Compiled Data & Feed for Scouts */}
         <div>
           <div className="card">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -160,7 +159,7 @@ export default function App() {
               {item.videoUrl && (
                 <div style={{ marginTop: '10px' }}>
                   <video controls width="100%" style={{ borderRadius: '5px', maxHeight: '250px' }}>
-                    <source src={`http://localhost:5000${item.videoUrl}`} />
+                    <source src={`${BACKEND_URL}${item.videoUrl}`} />
                     Your browser does not support video playback.
                   </video>
                 </div>
