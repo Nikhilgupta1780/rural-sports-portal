@@ -1,37 +1,45 @@
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
-const path = require('path');
+const path = path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+// Proper CORS Configuration
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type']
+}));
+
 app.use(express.json());
 
-// Uploads directory ensure karein
+// Temp Uploads Directory
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
+  fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Static folder for videos/photos
 app.use('/uploads', express.static(uploadDir));
 
-// Multer Disk Storage Configuration
+// Multer Storage Configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
+    cb(null, Date.now() + '-' + file.originalname.replace(/\s+/g, '_'));
   }
 });
 
-const upload = multer({ storage });
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+});
 
-// In-Memory Database (Demo ke liye, real app me MongoDB use kar sakte hain)
+// In-Memory Data Store
 let talentPosts = [
   {
     id: 1,
@@ -46,31 +54,46 @@ let talentPosts = [
   }
 ];
 
+// Root test endpoint
+app.get('/', (req, res) => {
+  res.send("Rural Sports Backend API is running live!");
+});
+
 // GET: Fetch all compiled sports talent data
 app.get('/api/talents', (req, res) => {
   res.json(talentPosts);
 });
 
-// POST: Add new rural talent entry with media upload
-app.post('/api/talents', upload.single('media'), (req, res) => {
-  const { name, sport, state, district, age, metric } = req.body;
+// POST: Add new rural talent entry
+app.post('/api/talents', (req, res) => {
+  upload.single('media')(req, res, (err) => {
+    if (err) {
+      console.error("Multer error:", err);
+    }
 
-  const newTalent = {
-    id: talentPosts.length + 1,
-    name,
-    sport,
-    state,
-    district,
-    age: parseInt(age),
-    metric,
-    videoUrl: req.file ? `/uploads/${req.file.filename}` : null,
-    date: new Date().toLocaleDateString()
-  };
+    const { name, sport, state, district, age, metric } = req.body;
 
-  talentPosts.unshift(newTalent);
-  res.status(201).json({ message: "Talent post created successfully!", talent: newTalent });
+    if (!name || !district) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    const newTalent = {
+      id: talentPosts.length + 1,
+      name,
+      sport: sport || 'Athletics',
+      state: state || 'Uttar Pradesh',
+      district,
+      age: parseInt(age) || 18,
+      metric: metric || 'N/A',
+      videoUrl: req.file ? `/uploads/${req.file.filename}` : null,
+      date: new Date().toLocaleDateString()
+    };
+
+    talentPosts.unshift(newTalent);
+    res.status(201).json({ message: "Talent post created successfully!", talent: newTalent });
+  });
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
