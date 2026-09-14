@@ -1,13 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
-const path = path = require('path');
+const path = require('path');
 const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Proper CORS Configuration
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST'],
@@ -16,7 +15,6 @@ app.use(cors({
 
 app.use(express.json());
 
-// Temp Uploads Directory
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -24,7 +22,6 @@ if (!fs.existsSync(uploadDir)) {
 
 app.use('/uploads', express.static(uploadDir));
 
-// Multer Storage Configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
@@ -36,42 +33,42 @@ const storage = multer.diskStorage({
 
 const upload = multer({ 
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+  limits: { fileSize: 10 * 1024 * 1024 }
 });
 
-// In-Memory Data Store
 let talentPosts = [
   {
     id: 1,
     name: "Ramesh Kumar",
-    sport: "Athletics (100m)",
+    sport: "Athletics",
     state: "Uttar Pradesh",
     district: "Gorakhpur",
     age: 18,
-    metric: "11.2 seconds",
+    gender: "Male",
+    height: "175",
+    weight: "68",
+    contact: "9876543210",
+    metric: "100m in 11.2s",
     videoUrl: null,
     date: new Date().toLocaleDateString()
   }
 ];
 
-// Root test endpoint
 app.get('/', (req, res) => {
   res.send("Rural Sports Backend API is running live!");
 });
 
-// GET: Fetch all compiled sports talent data
 app.get('/api/talents', (req, res) => {
   res.json(talentPosts);
 });
 
-// POST: Add new rural talent entry
 app.post('/api/talents', (req, res) => {
   upload.single('media')(req, res, (err) => {
     if (err) {
       console.error("Multer error:", err);
     }
 
-    const { name, sport, state, district, age, metric } = req.body;
+    const { name, sport, state, district, age, gender, height, weight, contact, metric } = req.body;
 
     if (!name || !district) {
       return res.status(400).json({ error: "Missing required fields" });
@@ -84,6 +81,10 @@ app.post('/api/talents', (req, res) => {
       state: state || 'Uttar Pradesh',
       district,
       age: parseInt(age) || 18,
+      gender: gender || 'Male',
+      height: height || 'N/A',
+      weight: weight || 'N/A',
+      contact: contact || 'N/A',
       metric: metric || 'N/A',
       videoUrl: req.file ? `/uploads/${req.file.filename}` : null,
       date: new Date().toLocaleDateString()
