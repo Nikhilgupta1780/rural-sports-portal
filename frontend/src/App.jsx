@@ -6,8 +6,9 @@ export default function App() {
   const [talents, setTalents] = useState([]);
   const [filterSport, setFilterSport] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [lang, setLang] = useState('en'); // 'en' or 'hi'
-  const [selectedAthlete, setSelectedAthlete] = useState(null); // Modal popup state
+  const [showOnlyShortlisted, setShowOnlyShortlisted] = useState(false);
+  const [lang, setLang] = useState('en');
+  const [selectedAthlete, setSelectedAthlete] = useState(null);
   const [shortlistedIds, setShortlistedIds] = useState([]);
 
   const [formData, setFormData] = useState({
@@ -89,6 +90,36 @@ export default function App() {
     }
   };
 
+  // Export Data to CSV (Excel)
+  const exportToCSV = () => {
+    if (talents.length === 0) return alert("No data available to export");
+    
+    const headers = ["ID", "Name", "Sport", "Age", "Gender", "District", "State", "Metric", "Contact", "Date"];
+    const rows = talents.map(t => [
+      t.id,
+      `"${t.name}"`,
+      `"${t.sport}"`,
+      t.age,
+      t.gender || 'N/A',
+      `"${t.district}"`,
+      `"${t.state || 'India'}"`,
+      `"${t.metric}"`,
+      `"${t.contact || 'N/A'}"`,
+      t.date
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Rural_Talent_Data_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   // Filter & Search Logic
   const filteredTalents = talents.filter((t) => {
     const matchesSport = filterSport === 'All' || t.sport.toLowerCase().includes(filterSport.toLowerCase());
@@ -99,10 +130,11 @@ export default function App() {
       (t.state && t.state.toLowerCase().includes(query)) ||
       t.metric.toLowerCase().includes(query);
 
-    return matchesSport && matchesSearch;
+    const matchesShortlist = showOnlyShortlisted ? shortlistedIds.includes(t.id) : true;
+
+    return matchesSport && matchesSearch && matchesShortlist;
   });
 
-  // UI Text Translations
   const t = {
     title: lang === 'hi' ? '🏆 ग्रामीण प्रतिभा पहचान पोर्टल' : '🏆 Rural Talent Identification',
     subtitle: lang === 'hi' ? 'ग्रामीण एथलीटों को आधिकारिक स्काउट्स से जोड़ना' : 'Connecting Hidden Rural Athletes with Official Scouts',
@@ -128,8 +160,15 @@ export default function App() {
 
   return (
     <div className="container">
-      {/* Top Language Toggle & Header */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+      {/* Top Language & Quick Controls */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+        <button 
+          onClick={exportToCSV}
+          style={{ width: 'auto', padding: '6px 16px', background: '#059669', fontSize: '13px' }}
+        >
+          📥 {lang === 'hi' ? 'एक्सेल (CSV) डाउनलोड करें' : 'Export Data (CSV)'}
+        </button>
+
         <button 
           onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
           style={{ width: 'auto', padding: '6px 16px', background: '#0f172a', fontSize: '13px' }}
@@ -145,6 +184,22 @@ export default function App() {
           👑 <strong>Team Leader:</strong> Ankush Gupta &nbsp;|&nbsp; 🤝 <strong>Team:</strong> Om, Amit, Sikha Kumari &nbsp;|&nbsp; 🎓 <strong>NIT Patna (EE)</strong>
         </div>
       </header>
+
+      {/* Analytics Summary Banner */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+        <div className="card" style={{ padding: '16px', textAlign: 'center', marginBottom: 0 }}>
+          <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', textTransform: 'uppercase' }}>Total Athletes Registered</div>
+          <div style={{ fontSize: '24px', fontWeight: '700', color: '#2563eb', marginTop: '4px' }}>{talents.length}</div>
+        </div>
+        <div className="card" style={{ padding: '16px', textAlign: 'center', marginBottom: 0 }}>
+          <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', textTransform: 'uppercase' }}>Shortlisted Talent</div>
+          <div style={{ fontSize: '24px', fontWeight: '700', color: '#16a34a', marginTop: '4px' }}>{shortlistedIds.length}</div>
+        </div>
+        <div className="card" style={{ padding: '16px', textAlign: 'center', marginBottom: 0 }}>
+          <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', textTransform: 'uppercase' }}>Active Sport Categories</div>
+          <div style={{ fontSize: '24px', fontWeight: '700', color: '#d97706', marginTop: '4px' }}>16 Sports</div>
+        </div>
+      </div>
 
       <div className="grid-layout">
         {/* Left Side: Submission Form */}
@@ -248,8 +303,13 @@ export default function App() {
               />
             </div>
 
-            <div className="filter-bar">
-              <select onChange={(e) => setFilterSport(e.target.value)} value={filterSport}>
+            {/* Filter Controls Bar */}
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              <select 
+                onChange={(e) => setFilterSport(e.target.value)} 
+                value={filterSport}
+                style={{ flex: 1, minWidth: '160px' }}
+              >
                 <option value="All">All Sports Categories</option>
                 <option value="Athletics">Athletics</option>
                 <option value="Kabaddi">Kabaddi</option>
@@ -268,6 +328,19 @@ export default function App() {
                 <option value="Swimming">Swimming</option>
                 <option value="Powerlifting">Powerlifting</option>
               </select>
+
+              <button
+                type="button"
+                onClick={() => setShowOnlyShortlisted(!showOnlyShortlisted)}
+                style={{
+                  width: 'auto',
+                  background: showOnlyShortlisted ? '#16a34a' : '#64748b',
+                  fontSize: '13px',
+                  padding: '10px 14px'
+                }}
+              >
+                {showOnlyShortlisted ? '✓ Shortlisted Only' : '⭐ Filter Shortlisted'}
+              </button>
             </div>
           </div>
 
@@ -332,7 +405,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* Detail Profile Modal View */}
+      {/* Modal View */}
       {selectedAthlete && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
           <div style={{ background: '#fff', padding: '24px', borderRadius: '12px', maxWidth: '500px', width: '90%', maxHeight: '90vh', overflowY: 'auto' }}>
@@ -347,12 +420,20 @@ export default function App() {
             <p><strong>Contact Info:</strong> {selectedAthlete.contact || '+91 9876543210 (Official Guardian)'}</p>
             <p><strong>Key Performance Record:</strong> {selectedAthlete.metric}</p>
 
-            <button 
-              onClick={() => setSelectedAthlete(null)}
-              style={{ marginTop: '20px', background: '#dc2626' }}
-            >
-              {t.close}
-            </button>
+            <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+              <button 
+                onClick={() => window.print()} 
+                style={{ background: '#2563eb' }}
+              >
+                🖨️ Print Profile ID
+              </button>
+              <button 
+                onClick={() => setSelectedAthlete(null)}
+                style={{ background: '#dc2626' }}
+              >
+                {t.close}
+              </button>
+            </div>
           </div>
         </div>
       )}
