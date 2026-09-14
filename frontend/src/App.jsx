@@ -84,9 +84,9 @@ export default function App() {
 
   return (
     <div className="container">
-      {/* Header with Team Tag */}
+      {/* Header with Updated Headline */}
       <header>
-        <h1>🏆 Rural Sports Talent Portal</h1>
+        <h1>🏆 Rural Talent Identification</h1>
         <p>Connecting Hidden Rural Athletes with Official Scouts</p>
         <div style={{ marginTop: '12px', fontSize: '13px', color: '#bfdbfe', background: 'rgba(255, 255, 255, 0.1)', padding: '6px 14px', borderRadius: '20px', display: 'inline-block' }}>
           👑 <strong>Team Leader:</strong> Ankush Gupta &nbsp;|&nbsp; 🤝 <strong>Team:</strong> Om, Amit, Sikha Kumari &nbsp;|&nbsp; 🎓 <strong>NIT Patna (EE)</strong>
