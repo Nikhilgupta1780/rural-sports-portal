@@ -5,6 +5,7 @@ const BACKEND_URL = 'https://rural-sports-portal.onrender.com';
 export default function App() {
   const [talents, setTalents] = useState([]);
   const [filterSport, setFilterSport] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     sport: 'Athletics',
@@ -68,9 +69,18 @@ export default function App() {
     }
   };
 
-  const filteredTalents = filterSport === 'All' 
-    ? talents 
-    : talents.filter(t => t.sport.toLowerCase().includes(filterSport.toLowerCase()));
+  // Filter & Search Logic
+  const filteredTalents = talents.filter((t) => {
+    const matchesSport = filterSport === 'All' || t.sport.toLowerCase().includes(filterSport.toLowerCase());
+    const query = searchQuery.toLowerCase();
+    const matchesSearch = 
+      t.name.toLowerCase().includes(query) ||
+      t.district.toLowerCase().includes(query) ||
+      t.state.toLowerCase().includes(query) ||
+      t.metric.toLowerCase().includes(query);
+
+    return matchesSport && matchesSearch;
+  });
 
   return (
     <div className="container">
@@ -80,6 +90,7 @@ export default function App() {
       </header>
 
       <div className="grid-layout">
+        {/* Left Side: Submission Form */}
         <div>
           <div className="card">
             <h2>Post Talent Details</h2>
@@ -90,14 +101,27 @@ export default function App() {
               </div>
 
               <div className="form-group">
-                <label>Sport Category</label>
+                <label>Sport Category (16 Sports)</label>
                 <select name="sport" value={formData.sport} onChange={handleChange}>
+                  {/* Original 6 Sports */}
                   <option value="Athletics">Athletics / Running</option>
                   <option value="Kabaddi">Kabaddi</option>
                   <option value="Wrestling">Wrestling / Kushti</option>
                   <option value="Weightlifting">Weightlifting</option>
                   <option value="Cricket">Cricket</option>
                   <option value="Football">Football</option>
+                  
+                  {/* 10 New Sports Added */}
+                  <option value="Kho-Kho">Kho-Kho</option>
+                  <option value="Archery">Archery (Tirandazi)</option>
+                  <option value="Volleyball">Volleyball</option>
+                  <option value="Badminton">Badminton</option>
+                  <option value="Boxing">Boxing</option>
+                  <option value="Hockey">Hockey</option>
+                  <option value="Shooting">Shooting</option>
+                  <option value="Judo / Martial Arts">Judo / Martial Arts</option>
+                  <option value="Swimming">Swimming</option>
+                  <option value="Powerlifting">Powerlifting</option>
                 </select>
               </div>
 
@@ -126,50 +150,82 @@ export default function App() {
           </div>
         </div>
 
+        {/* Right Side: Compiled Data Feed + Search */}
         <div>
           <div className="card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
               <h2>Compiled Talent Feed</h2>
               <span className="badge">{filteredTalents.length} Athletes Found</span>
             </div>
 
-            <div className="filter-bar" style={{ marginTop: '15px' }}>
-              <select onChange={(e) => setFilterSport(e.target.value)}>
-                <option value="All">Filter by Sport: All</option>
+            {/* Top Search Bar */}
+            <div className="form-group">
+              <input 
+                type="text" 
+                placeholder="🔍 Search by Athlete Name, District, State..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ padding: '12px', fontSize: '15px', borderRadius: '6px' }}
+              />
+            </div>
+
+            {/* Sport Category Filter */}
+            <div className="filter-bar">
+              <select onChange={(e) => setFilterSport(e.target.value)} value={filterSport}>
+                <option value="All">All Sports Categories</option>
                 <option value="Athletics">Athletics</option>
                 <option value="Kabaddi">Kabaddi</option>
                 <option value="Wrestling">Wrestling</option>
                 <option value="Weightlifting">Weightlifting</option>
+                <option value="Cricket">Cricket</option>
+                <option value="Football">Football</option>
+                <option value="Kho-Kho">Kho-Kho</option>
+                <option value="Archery">Archery</option>
+                <option value="Volleyball">Volleyball</option>
+                <option value="Badminton">Badminton</option>
+                <option value="Boxing">Boxing</option>
+                <option value="Hockey">Hockey</option>
+                <option value="Shooting">Shooting</option>
+                <option value="Judo">Judo / Martial Arts</option>
+                <option value="Swimming">Swimming</option>
+                <option value="Powerlifting">Powerlifting</option>
               </select>
             </div>
           </div>
 
-          {filteredTalents.map((item) => (
-            <div key={item.id} className="card talent-card">
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <h3>{item.name} ({item.age} yrs)</h3>
-                <span className="badge">{item.sport}</span>
-              </div>
-              <p style={{ color: '#666', marginTop: '5px' }}>📍 {item.district}, {item.state}</p>
-              
-              <div style={{ background: '#f8fafc', padding: '10px', borderRadius: '5px', margin: '10px 0' }}>
-                <strong>Best Metric / Record:</strong> {item.metric}
-              </div>
-
-              {item.videoUrl && (
-                <div style={{ marginTop: '10px' }}>
-                  <video controls width="100%" style={{ borderRadius: '5px', maxHeight: '250px' }}>
-                    <source src={`${BACKEND_URL}${item.videoUrl}`} />
-                    Your browser does not support video playback.
-                  </video>
-                </div>
-              )}
-
-              <div style={{ fontSize: '12px', color: '#888', marginTop: '10px' }}>
-                Posted on: {item.date}
-              </div>
+          {/* Render Athlete Cards */}
+          {filteredTalents.length === 0 ? (
+            <div className="card" style={{ textAlign: 'center', color: '#777', padding: '30px' }}>
+              No athletes match your search criteria.
             </div>
-          ))}
+          ) : (
+            filteredTalents.map((item) => (
+              <div key={item.id} className="card talent-card">
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <h3>{item.name} ({item.age} yrs)</h3>
+                  <span className="badge">{item.sport}</span>
+                </div>
+                <p style={{ color: '#666', marginTop: '5px' }}>📍 {item.district}, {item.state}</p>
+                
+                <div style={{ background: '#f8fafc', padding: '10px', borderRadius: '5px', margin: '10px 0' }}>
+                  <strong>Best Metric / Record:</strong> {item.metric}
+                </div>
+
+                {item.videoUrl && (
+                  <div style={{ marginTop: '10px' }}>
+                    <video controls width="100%" style={{ borderRadius: '5px', maxHeight: '250px' }}>
+                      <source src={`${BACKEND_URL}${item.videoUrl}`} />
+                      Your browser does not support video playback.
+                    </video>
+                  </div>
+                )}
+
+                <div style={{ fontSize: '12px', color: '#888', marginTop: '10px' }}>
+                  Posted on: {item.date}
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
