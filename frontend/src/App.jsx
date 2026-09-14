@@ -84,9 +84,13 @@ export default function App() {
 
   return (
     <div className="container">
+      {/* Header with Creator Info */}
       <header>
         <h1>🏆 Rural Sports Talent Portal</h1>
         <p>Connecting Hidden Rural Athletes with Official Scouts</p>
+        <div style={{ marginTop: '12px', fontSize: '13px', color: '#bfdbfe', background: 'rgba(255, 255, 255, 0.1)', padding: '6px 14px', borderRadius: '20px', display: 'inline-block' }}>
+          🚀 Developed by <strong>Ankush Gupta</strong> | Electrical Engineering, NIT Patna
+        </div>
       </header>
 
       <div className="grid-layout">
@@ -103,15 +107,12 @@ export default function App() {
               <div className="form-group">
                 <label>Sport Category (16 Sports)</label>
                 <select name="sport" value={formData.sport} onChange={handleChange}>
-                  {/* Original 6 Sports */}
                   <option value="Athletics">Athletics / Running</option>
                   <option value="Kabaddi">Kabaddi</option>
                   <option value="Wrestling">Wrestling / Kushti</option>
                   <option value="Weightlifting">Weightlifting</option>
                   <option value="Cricket">Cricket</option>
                   <option value="Football">Football</option>
-                  
-                  {/* 10 New Sports Added */}
                   <option value="Kho-Kho">Kho-Kho</option>
                   <option value="Archery">Archery (Tirandazi)</option>
                   <option value="Volleyball">Volleyball</option>
@@ -228,6 +229,12 @@ export default function App() {
           )}
         </div>
       </div>
+
+      {/* Footer Credit Section */}
+      <footer style={{ marginTop: '40px', textAlign: 'center', padding: '20px', background: '#ffffff', borderRadius: '12px', border: '1px solid #e2e8f0', color: '#64748b', fontSize: '14px' }}>
+        <p>🎓 <strong>Project Developed By:</strong> Ankush Gupta</p>
+        <p style={{ marginTop: '4px', fontSize: '13px' }}>Electrical Engineering Branch, National Institute of Technology (NIT) Patna</p>
+      </footer>
     </div>
   );
 }
