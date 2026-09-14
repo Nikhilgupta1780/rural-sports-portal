@@ -460,7 +460,7 @@ export default function App() {
         <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap', marginTop: '12px' }}>
           <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', padding: '10px 18px', borderRadius: '8px', textAlign: 'center', minWidth: '180px' }}>
             <span style={{ fontSize: '11px', fontWeight: '700', color: '#1d4ed8', textTransform: 'uppercase' }}>Team Leader</span>
-            <div style={{ fontWeight: '700', color: '#1e293b', fontSize: '15px', marginTop: '2px' }}>Ankush Gupta</div>
+            <div style={{ fontWeight: '700', color: '#1e293b', fontSize: '15px', marginTop: '2px' }}>Ankush </div>
           </div>
           <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '10px 18px', borderRadius: '8px', textAlign: 'center', minWidth: '140px' }}>
             <span style={{ fontSize: '11px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase' }}>Team Member</span>
@@ -472,7 +472,7 @@ export default function App() {
           </div>
           <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '10px 18px', borderRadius: '8px', textAlign: 'center', minWidth: '140px' }}>
             <span style={{ fontSize: '11px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase' }}>Team Member</span>
-            <div style={{ fontWeight: '600', color: '#334155', fontSize: '14px', marginTop: '2px' }}>Sikha Kumari</div>
+            <div style={{ fontWeight: '600', color: '#334155', fontSize: '14px', marginTop: '2px' }}>Sikha </div>
           </div>
         </div>
       </footer>
