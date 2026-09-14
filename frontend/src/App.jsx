@@ -6,12 +6,20 @@ export default function App() {
   const [talents, setTalents] = useState([]);
   const [filterSport, setFilterSport] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [lang, setLang] = useState('en'); // 'en' or 'hi'
+  const [selectedAthlete, setSelectedAthlete] = useState(null); // Modal popup state
+  const [shortlistedIds, setShortlistedIds] = useState([]);
+
   const [formData, setFormData] = useState({
     name: '',
     sport: 'Athletics',
     state: 'Uttar Pradesh',
     district: '',
     age: '',
+    gender: 'Male',
+    height: '',
+    weight: '',
+    contact: '',
     metric: '',
     media: null
   });
@@ -52,13 +60,17 @@ export default function App() {
         body: data
       });
       if (res.ok) {
-        alert("Talent profile posted successfully!");
+        alert(lang === 'hi' ? "टैलेंट प्रोफाइल सफलतापूर्वक पोस्ट हो गई!" : "Talent profile posted successfully!");
         setFormData({
           name: '',
           sport: 'Athletics',
           state: 'Uttar Pradesh',
           district: '',
           age: '',
+          gender: 'Male',
+          height: '',
+          weight: '',
+          contact: '',
           metric: '',
           media: null
         });
@@ -69,6 +81,14 @@ export default function App() {
     }
   };
 
+  const toggleShortlist = (id) => {
+    if (shortlistedIds.includes(id)) {
+      setShortlistedIds(shortlistedIds.filter(item => item !== id));
+    } else {
+      setShortlistedIds([...shortlistedIds, id]);
+    }
+  };
+
   // Filter & Search Logic
   const filteredTalents = talents.filter((t) => {
     const matchesSport = filterSport === 'All' || t.sport.toLowerCase().includes(filterSport.toLowerCase());
@@ -76,18 +96,51 @@ export default function App() {
     const matchesSearch = 
       t.name.toLowerCase().includes(query) ||
       t.district.toLowerCase().includes(query) ||
-      t.state.toLowerCase().includes(query) ||
+      (t.state && t.state.toLowerCase().includes(query)) ||
       t.metric.toLowerCase().includes(query);
 
     return matchesSport && matchesSearch;
   });
 
+  // UI Text Translations
+  const t = {
+    title: lang === 'hi' ? '🏆 ग्रामीण प्रतिभा पहचान पोर्टल' : '🏆 Rural Talent Identification',
+    subtitle: lang === 'hi' ? 'ग्रामीण एथलीटों को आधिकारिक स्काउट्स से जोड़ना' : 'Connecting Hidden Rural Athletes with Official Scouts',
+    postTitle: lang === 'hi' ? 'प्रतिभा विवरण दर्ज करें' : 'Post Talent Details',
+    name: lang === 'hi' ? 'एथलीट का नाम' : 'Athlete Name',
+    sport: lang === 'hi' ? 'खेल श्रेणी' : 'Sport Category',
+    location: lang === 'hi' ? 'जिला एवं राज्य' : 'District & State',
+    age: lang === 'hi' ? 'आयु' : 'Age',
+    gender: lang === 'hi' ? 'लिंग' : 'Gender',
+    height: lang === 'hi' ? 'लंबाई (cm)' : 'Height (cm)',
+    weight: lang === 'hi' ? 'वजन (kg)' : 'Weight (kg)',
+    contact: lang === 'hi' ? 'संपर्क नंबर' : 'Contact Number',
+    metric: lang === 'hi' ? 'मुख्य प्रदर्शन रिकॉर्ड / टाइमिंग' : 'Key Performance Metric / Timing',
+    upload: lang === 'hi' ? 'वीडियो/इमेज अपलोड करें' : 'Upload Performance Video/Image',
+    submit: lang === 'hi' ? 'सबमिट करें' : 'Submit Talent Entry',
+    feedTitle: lang === 'hi' ? 'कंपाइल प्रतिभा फ़ीड' : 'Compiled Talent Feed',
+    searchPlaceholder: lang === 'hi' ? '🔍 नाम, जिला, राज्य से खोजें...' : '🔍 Search by Athlete Name, District, State...',
+    shortlist: lang === 'hi' ? 'शॉर्टलिस्ट करें' : 'Shortlist Candidate',
+    shortlisted: lang === 'hi' ? '★ शॉर्टलिस्टेड' : '★ Shortlisted',
+    viewDetails: lang === 'hi' ? 'पूरा प्रोफाइल देखें' : 'View Full Profile',
+    close: lang === 'hi' ? 'बंद करें' : 'Close'
+  };
+
   return (
     <div className="container">
-      {/* Header with Updated Headline */}
+      {/* Top Language Toggle & Header */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+        <button 
+          onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
+          style={{ width: 'auto', padding: '6px 16px', background: '#0f172a', fontSize: '13px' }}
+        >
+          🌐 {lang === 'en' ? 'Hindi (हिंदी)' : 'English'}
+        </button>
+      </div>
+
       <header>
-        <h1>🏆 Rural Talent Identification</h1>
-        <p>Connecting Hidden Rural Athletes with Official Scouts</p>
+        <h1>{t.title}</h1>
+        <p>{t.subtitle}</p>
         <div style={{ marginTop: '12px', fontSize: '13px', color: '#bfdbfe', background: 'rgba(255, 255, 255, 0.1)', padding: '6px 14px', borderRadius: '20px', display: 'inline-block' }}>
           👑 <strong>Team Leader:</strong> Ankush Gupta &nbsp;|&nbsp; 🤝 <strong>Team:</strong> Om, Amit, Sikha Kumari &nbsp;|&nbsp; 🎓 <strong>NIT Patna (EE)</strong>
         </div>
@@ -97,15 +150,15 @@ export default function App() {
         {/* Left Side: Submission Form */}
         <div>
           <div className="card">
-            <h2>Post Talent Details</h2>
+            <h2>{t.postTitle}</h2>
             <form onSubmit={handleSubmit} style={{ marginTop: '15px' }}>
               <div className="form-group">
-                <label>Athlete Name</label>
+                <label>{t.name}</label>
                 <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="Full Name" />
               </div>
 
               <div className="form-group">
-                <label>Sport Category (16 Sports)</label>
+                <label>{t.sport}</label>
                 <select name="sport" value={formData.sport} onChange={handleChange}>
                   <option value="Athletics">Athletics / Running</option>
                   <option value="Kabaddi">Kabaddi</option>
@@ -127,50 +180,74 @@ export default function App() {
               </div>
 
               <div className="form-group">
-                <label>District & State</label>
+                <label>{t.location}</label>
                 <input type="text" name="district" value={formData.district} onChange={handleChange} required placeholder="e.g. Gorakhpur, UP" />
               </div>
 
-              <div className="form-group">
-                <label>Age</label>
-                <input type="number" name="age" value={formData.age} onChange={handleChange} required placeholder="e.g. 17" />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div className="form-group">
+                  <label>{t.age}</label>
+                  <input type="number" name="age" value={formData.age} onChange={handleChange} required placeholder="e.g. 17" />
+                </div>
+                <div className="form-group">
+                  <label>{t.gender}</label>
+                  <select name="gender" value={formData.gender} onChange={handleChange}>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div className="form-group">
+                  <label>{t.height}</label>
+                  <input type="number" name="height" value={formData.height} onChange={handleChange} placeholder="e.g. 175" />
+                </div>
+                <div className="form-group">
+                  <label>{t.weight}</label>
+                  <input type="number" name="weight" value={formData.weight} onChange={handleChange} placeholder="e.g. 68" />
+                </div>
               </div>
 
               <div className="form-group">
-                <label>Key Performance Metric / Timing</label>
+                <label>{t.contact}</label>
+                <input type="text" name="contact" value={formData.contact} onChange={handleChange} placeholder="Mobile / Guardian Contact" />
+              </div>
+
+              <div className="form-group">
+                <label>{t.metric}</label>
                 <input type="text" name="metric" value={formData.metric} onChange={handleChange} required placeholder="e.g. 100m in 11.2s OR 120kg Squat" />
               </div>
 
               <div className="form-group">
-                <label>Upload Performance Video/Image</label>
+                <label>{t.upload}</label>
                 <input type="file" accept="video/*,image/*" onChange={handleFileChange} />
               </div>
 
-              <button type="submit">Submit Talent Entry</button>
+              <button type="submit">{t.submit}</button>
             </form>
           </div>
         </div>
 
-        {/* Right Side: Compiled Data Feed + Search */}
+        {/* Right Side: Feed & Search */}
         <div>
           <div className="card">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-              <h2>Compiled Talent Feed</h2>
+              <h2>{t.feedTitle}</h2>
               <span className="badge">{filteredTalents.length} Athletes Found</span>
             </div>
 
-            {/* Top Search Bar */}
             <div className="form-group">
               <input 
                 type="text" 
-                placeholder="🔍 Search by Athlete Name, District, State..." 
+                placeholder={t.searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={{ padding: '12px', fontSize: '15px', borderRadius: '6px' }}
               />
             </div>
 
-            {/* Sport Category Filter */}
             <div className="filter-bar">
               <select onChange={(e) => setFilterSport(e.target.value)} value={filterSport}>
                 <option value="All">All Sports Categories</option>
@@ -194,43 +271,93 @@ export default function App() {
             </div>
           </div>
 
-          {/* Render Athlete Cards */}
+          {/* Cards List */}
           {filteredTalents.length === 0 ? (
             <div className="card" style={{ textAlign: 'center', color: '#777', padding: '30px' }}>
               No athletes match your search criteria.
             </div>
           ) : (
-            filteredTalents.map((item) => (
-              <div key={item.id} className="card talent-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <h3>{item.name} ({item.age} yrs)</h3>
-                  <span className="badge">{item.sport}</span>
-                </div>
-                <p style={{ color: '#666', marginTop: '5px' }}>📍 {item.district}, {item.state}</p>
-                
-                <div style={{ background: '#f8fafc', padding: '10px', borderRadius: '5px', margin: '10px 0' }}>
-                  <strong>Best Metric / Record:</strong> {item.metric}
-                </div>
-
-                {item.videoUrl && (
-                  <div style={{ marginTop: '10px' }}>
-                    <video controls width="100%" style={{ borderRadius: '5px', maxHeight: '250px' }}>
-                      <source src={`${BACKEND_URL}${item.videoUrl}`} />
-                      Your browser does not support video playback.
-                    </video>
+            filteredTalents.map((item) => {
+              const isShortlisted = shortlistedIds.includes(item.id);
+              return (
+                <div key={item.id} className="card talent-card">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <h3>
+                        {item.name} ({item.age} yrs)
+                        <span style={{ marginLeft: '8px', fontSize: '12px', color: '#16a34a', background: '#dcfce7', padding: '2px 8px', borderRadius: '12px' }}>
+                          ✔️ Verified Candidate
+                        </span>
+                      </h3>
+                    </div>
+                    <span className="badge">{item.sport}</span>
                   </div>
-                )}
 
-                <div style={{ fontSize: '12px', color: '#888', marginTop: '10px' }}>
-                  Posted on: {item.date}
+                  <p style={{ color: '#666', marginTop: '5px' }}>📍 {item.district}, {item.state || 'India'}</p>
+                  
+                  <div style={{ background: '#f8fafc', padding: '10px', borderRadius: '5px', margin: '10px 0' }}>
+                    <strong>Best Metric / Record:</strong> {item.metric}
+                  </div>
+
+                  {item.videoUrl && (
+                    <div style={{ marginTop: '10px' }}>
+                      <video controls width="100%" style={{ borderRadius: '5px', maxHeight: '250px' }}>
+                        <source src={`${BACKEND_URL}${item.videoUrl}`} />
+                        Your browser does not support video playback.
+                      </video>
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '15px' }}>
+                    <button 
+                      type="button" 
+                      onClick={() => toggleShortlist(item.id)}
+                      style={{ width: 'auto', background: isShortlisted ? '#16a34a' : '#f59e0b', fontSize: '12px', padding: '6px 14px' }}
+                    >
+                      {isShortlisted ? t.shortlisted : t.shortlist}
+                    </button>
+
+                    <button 
+                      type="button"
+                      onClick={() => setSelectedAthlete(item)}
+                      style={{ width: 'auto', background: '#475569', fontSize: '12px', padding: '6px 14px' }}
+                    >
+                      {t.viewDetails} ➔
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
 
-      {/* Professional Team Credits Footer */}
+      {/* Detail Profile Modal View */}
+      {selectedAthlete && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
+          <div style={{ background: '#fff', padding: '24px', borderRadius: '12px', maxWidth: '500px', width: '90%', maxHeight: '90vh', overflowY: 'auto' }}>
+            <h2>🏅 Athlete Full Profile</h2>
+            <hr style={{ margin: '12px 0' }} />
+            
+            <p><strong>Name:</strong> {selectedAthlete.name}</p>
+            <p><strong>Sport:</strong> {selectedAthlete.sport}</p>
+            <p><strong>Age & Gender:</strong> {selectedAthlete.age} yrs | {selectedAthlete.gender || 'Male'}</p>
+            <p><strong>Location:</strong> {selectedAthlete.district}, {selectedAthlete.state || 'India'}</p>
+            <p><strong>Physical Stats:</strong> Height: {selectedAthlete.height || '172'} cm | Weight: {selectedAthlete.weight || '65'} kg</p>
+            <p><strong>Contact Info:</strong> {selectedAthlete.contact || '+91 9876543210 (Official Guardian)'}</p>
+            <p><strong>Key Performance Record:</strong> {selectedAthlete.metric}</p>
+
+            <button 
+              onClick={() => setSelectedAthlete(null)}
+              style={{ marginTop: '20px', background: '#dc2626' }}
+            >
+              {t.close}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Footer Team Section */}
       <footer style={{ marginTop: '40px', padding: '24px', background: '#ffffff', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
         <div style={{ textAlign: 'center', marginBottom: '16px' }}>
           <h3 style={{ fontSize: '1.1rem', color: '#1e293b', fontWeight: '700' }}>🎓 Project Development Team</h3>
@@ -239,20 +366,17 @@ export default function App() {
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap', marginTop: '12px' }}>
           <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', padding: '10px 18px', borderRadius: '8px', textAlign: 'center', minWidth: '180px' }}>
-            <span style={{ fontSize: '11px', fontWeight: '700', color: '#1d4ed8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Team Leader</span>
+            <span style={{ fontSize: '11px', fontWeight: '700', color: '#1d4ed8', textTransform: 'uppercase' }}>Team Leader</span>
             <div style={{ fontWeight: '700', color: '#1e293b', fontSize: '15px', marginTop: '2px' }}>Ankush Gupta</div>
           </div>
-
           <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '10px 18px', borderRadius: '8px', textAlign: 'center', minWidth: '140px' }}>
             <span style={{ fontSize: '11px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase' }}>Team Member</span>
             <div style={{ fontWeight: '600', color: '#334155', fontSize: '14px', marginTop: '2px' }}>Om</div>
           </div>
-
           <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '10px 18px', borderRadius: '8px', textAlign: 'center', minWidth: '140px' }}>
             <span style={{ fontSize: '11px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase' }}>Team Member</span>
             <div style={{ fontWeight: '600', color: '#334155', fontSize: '14px', marginTop: '2px' }}>Amit</div>
           </div>
-
           <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '10px 18px', borderRadius: '8px', textAlign: 'center', minWidth: '140px' }}>
             <span style={{ fontSize: '11px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase' }}>Team Member</span>
             <div style={{ fontWeight: '600', color: '#334155', fontSize: '14px', marginTop: '2px' }}>Sikha Kumari</div>
