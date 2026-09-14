@@ -195,7 +195,7 @@ export default function App() {
         <h1>{t.title}</h1>
         <p>{t.subtitle}</p>
         <div style={{ marginTop: '12px', fontSize: '13px', color: '#bfdbfe', background: 'rgba(255, 255, 255, 0.1)', padding: '6px 14px', borderRadius: '20px', display: 'inline-block' }}>
-          👑 <strong>Team Leader:</strong> Ankush Gupta &nbsp;|&nbsp; 🤝 <strong>Team:</strong> Om, Amit, Sikha Kumari &nbsp;|&nbsp; 🎓 <strong>NIT Patna (EE)</strong>
+  👑   <strong>Team Leader:</strong> Ankush &nbsp;|&nbsp; 🤝 <strong>Team:</strong> Om, Amit, Sikha &nbsp;|&nbsp; 🎓 <strong>NIT Patna (EE)</strong>
         </div>
       </header>
 
