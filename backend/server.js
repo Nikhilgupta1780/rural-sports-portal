@@ -82,9 +82,9 @@ app.post('/api/talents', (req, res) => {
       district,
       age: parseInt(age) || 18,
       gender: gender || 'Male',
-      height: height || 'N/A',
-      weight: weight || 'N/A',
-      contact: contact || 'N/A',
+      height: height || '',
+      weight: weight || '',
+      contact: contact || '',
       metric: metric || 'N/A',
       videoUrl: req.file ? `/uploads/${req.file.filename}` : null,
       date: new Date().toLocaleDateString()
