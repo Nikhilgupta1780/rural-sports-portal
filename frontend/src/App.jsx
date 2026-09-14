@@ -84,12 +84,12 @@ export default function App() {
 
   return (
     <div className="container">
-      {/* Header with Creator Info */}
+      {/* Header with Team Tag */}
       <header>
         <h1>🏆 Rural Sports Talent Portal</h1>
         <p>Connecting Hidden Rural Athletes with Official Scouts</p>
         <div style={{ marginTop: '12px', fontSize: '13px', color: '#bfdbfe', background: 'rgba(255, 255, 255, 0.1)', padding: '6px 14px', borderRadius: '20px', display: 'inline-block' }}>
-          🚀 Developed by <strong>Ankush Gupta</strong> | Electrical Engineering, NIT Patna
+          👑 <strong>Team Leader:</strong> Ankush Gupta &nbsp;|&nbsp; 🤝 <strong>Team:</strong> Om, Amit, Sikha Kumari &nbsp;|&nbsp; 🎓 <strong>NIT Patna (EE)</strong>
         </div>
       </header>
 
@@ -230,10 +230,34 @@ export default function App() {
         </div>
       </div>
 
-      {/* Footer Credit Section */}
-      <footer style={{ marginTop: '40px', textAlign: 'center', padding: '20px', background: '#ffffff', borderRadius: '12px', border: '1px solid #e2e8f0', color: '#64748b', fontSize: '14px' }}>
-        <p>🎓 <strong>Project Developed By:</strong> Ankush Gupta</p>
-        <p style={{ marginTop: '4px', fontSize: '13px' }}>Electrical Engineering Branch, National Institute of Technology (NIT) Patna</p>
+      {/* Professional Team Credits Footer */}
+      <footer style={{ marginTop: '40px', padding: '24px', background: '#ffffff', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+        <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+          <h3 style={{ fontSize: '1.1rem', color: '#1e293b', fontWeight: '700' }}>🎓 Project Development Team</h3>
+          <p style={{ fontSize: '0.875rem', color: '#64748b' }}>Electrical Engineering Department | National Institute of Technology (NIT) Patna</p>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap', marginTop: '12px' }}>
+          <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', padding: '10px 18px', borderRadius: '8px', textAlign: 'center', minWidth: '180px' }}>
+            <span style={{ fontSize: '11px', fontWeight: '700', color: '#1d4ed8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Team Leader</span>
+            <div style={{ fontWeight: '700', color: '#1e293b', fontSize: '15px', marginTop: '2px' }}>Ankush Gupta</div>
+          </div>
+
+          <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '10px 18px', borderRadius: '8px', textAlign: 'center', minWidth: '140px' }}>
+            <span style={{ fontSize: '11px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase' }}>Team Member</span>
+            <div style={{ fontWeight: '600', color: '#334155', fontSize: '14px', marginTop: '2px' }}>Om</div>
+          </div>
+
+          <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '10px 18px', borderRadius: '8px', textAlign: 'center', minWidth: '140px' }}>
+            <span style={{ fontSize: '11px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase' }}>Team Member</span>
+            <div style={{ fontWeight: '600', color: '#334155', fontSize: '14px', marginTop: '2px' }}>Amit</div>
+          </div>
+
+          <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '10px 18px', borderRadius: '8px', textAlign: 'center', minWidth: '140px' }}>
+            <span style={{ fontSize: '11px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase' }}>Team Member</span>
+            <div style={{ fontWeight: '600', color: '#334155', fontSize: '14px', marginTop: '2px' }}>Sikha Kumari</div>
+          </div>
+        </div>
       </footer>
     </div>
   );
